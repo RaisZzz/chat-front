@@ -1,13 +1,14 @@
 <template>
   <div class="wrapper">
-    <form class="form">
+    <form class="form" @input="checkForm" @submit.prevent="registration">
       <p class="form__title">{{ title }}</p>
       <div class="form__input-wrapper">
-        <input type="text" class="form__input" name="login" :placeholder="$t('form.username')">
-        <input type="password" class="form__input" name="password" :placeholder="$t('form.password')">
+        <input type="text" v-model="username" class="form__input" :class="{ error : usernameError }" name="login" :placeholder="$t('form.username')">
+        <input type="text" v-model="email" class="form__input" :class="{ error : emailError }" name="mail" :placeholder="$t('form.email')">
+        <input type="password" v-model="password" class="form__input" :class="{ error : passwordError }" name="password" :placeholder="$t('form.password')">
       </div>
-      <input type="submit" class="form__submit" :disabled="disabled" :value="$t('form.login')">
-      <router-link class="form__link" to="/registration">{{ $t("form.registration") }}</router-link>
+      <input type="submit" class="form__submit" :disabled="disabled" :value="$t('form.register')">
+      <router-link class="form__link" to="/login">{{ $t("form.login") }}</router-link>
     </form>
   </div>
 </template>
@@ -17,7 +18,34 @@ export default {
   data: () => {
     return {
       title: '',
-      disabled: true
+      disabled: true,
+      username: '',
+      email: '',
+      password: '',
+      usernameError: true,
+      emailError: true,
+      passwordError: true
+    }
+  },
+  methods: {
+    checkForm() {
+      this.usernameError = !this.username
+
+      this.emailError = !this.email || !/^\w+([.-]?\w+)*@\w+([.-]?\w+)*(\.\w{2,3})+$/.test(this.email)
+
+      this.passwordError = !this.password
+
+      this.disabled = this.usernameError || this.emailError || this.passwordError
+    },
+    async registration() {
+      const response = await this.$store.dispatch('registration', {
+        username: this.username,
+        email: this.email,
+        password: this.password
+      })
+      if (response.data && response.data.token) {
+        this.$router.push('/', {replace: true})
+      }
     }
   },
   mounted() {
