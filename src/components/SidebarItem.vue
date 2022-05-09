@@ -62,6 +62,9 @@ export default {
   font-weight: 600;
   margin-left: 10px;
   transition: var(--main-trans);
+  max-width: 100%;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 .sidebar-item:hover {
   opacity: 0.7;

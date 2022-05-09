@@ -23,10 +23,6 @@ export default {
   },
   mounted() {
     this.chats = this.$store.getters['openedChats']
-  },
-  beforeUnmount() {
-    this.sockets.unsubscribe('message')
-    this.sockets.unsubscribe('chat')
   }
 }
 </script>

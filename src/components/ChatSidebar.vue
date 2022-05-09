@@ -60,5 +60,6 @@ export default {
 .sidebar__chats {
   max-height: 100%;
   overflow-y: auto;
+  flex: 1;
 }
 </style>

@@ -54,9 +54,9 @@ export default {
     openSettings() {
       this.settings = !this.settings
     },
-    logout() {
+    async logout() {
       this.$store.commit('logout')
-      this.$router.push('/login', {replace: true})
+      await this.$router.push({path: '/login', replace: true})
     },
     async openSearch() {
       this.searchOpened = true
@@ -249,6 +249,13 @@ export default {
 .invite-popup__search:focus {
   border-color: var(--primary-color);
 }
+.user-col {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  max-width: 80%;
+}
 .users {
   display: flex;
   flex-direction: column;
@@ -263,11 +270,13 @@ export default {
   align-items: center;
   justify-content: space-between;
   gap: 10px;
+  width: 100%;
 }
 .user__name {
   text-align: left;
-  width: 100%;
   font-size: 16px;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 .user__name-owner {
   color: var(--primary-color);
