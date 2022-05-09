@@ -19,7 +19,10 @@
           :key="msg.id"
           class="chat__message"
           :class="{ owner : userId == msg.userId}"
-      >{{msg.text}}</p>
+      >
+        {{msg.text}}
+        <span class="chat__message-date">{{getDate(msg.createdAt)}}</span>
+      </p>
       <p class="chat__messages-null" v-if="!messages.length">{{ $t('chat.notMessages') }}</p>
     </div>
     <form class="chat__input" @submit.prevent="sendMessage">
@@ -127,11 +130,44 @@ export default {
           this.loading = false
           return
         }
-        response.data.messages.forEach(msg => {
+        response.data.messages.reverse().forEach(msg => {
           this.messages.unshift(msg)
         })
         this.loading = false
       }
+    },
+    getDate(date) {
+      const DATE = new Date(date)
+      const CURRENTLY = new Date()
+      const currently_day = CURRENTLY.getDate()
+      const currently_month = CURRENTLY.getMonth() + 1
+      const currently_year = CURRENTLY.getFullYear()
+      let day = DATE.getDate()
+      let month = DATE.getMonth() + 1
+      const year= DATE.getFullYear()
+
+      let hours = DATE.getHours()
+      let minutes = DATE.getMinutes()
+      if (hours < 10) hours = `0${hours}`
+      if (minutes < 10) minutes = `0${minutes}`
+
+      if (currently_day === day && currently_month === month && currently_year === year) {
+        return `${hours}:${minutes}`
+      }
+
+      const YESTERDAY = new Date()
+      YESTERDAY.setDate(YESTERDAY.getDate() - 1)
+      const yesterday_day = YESTERDAY.getDate()
+      const yesterday_month = YESTERDAY.getMonth() + 1
+      const yesterday_year = YESTERDAY.getFullYear()
+
+      if (yesterday_day === day && yesterday_month === month && yesterday_year === year) {
+        return `${this.$t('chat.yesterday')}, ${hours}:${minutes}`
+      }
+
+      if (day < 10) day = `0${day}`
+      if (month < 10) month = `0${month}`
+      return `${day}.${month}.${year}. ${hours}:${minutes}`
     }
   },
   async mounted() {
@@ -278,6 +314,13 @@ export default {
   background-color: var(--bg-color);
   border-radius: 10px 10px 0 10px;
   padding: 6px 10px;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+}
+.chat__message-date {
+  opacity: 0.5;
+  font-size: 12px;
 }
 .chat__message:first-child {
   margin-top: auto;
@@ -287,6 +330,7 @@ export default {
   color: var(--primary-color-invert);
   margin-left: auto;
   border-radius: 10px 10px 10px 0;
+  align-items: flex-end;
 }
 .chat__messages-null {
   text-align: center;

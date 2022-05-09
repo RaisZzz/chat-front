@@ -24,7 +24,8 @@ export const messages = {
             notMessages: "Сообщений нет.",
             owner: "вы",
             personal: "личное",
-            null: "Чатов нет."
+            null: "Чатов нет.",
+            yesterday: "Вчера"
         }
     },
     en: {
