@@ -50,6 +50,6 @@ export default {
 }
 .chats-enter-from,
 .chats-leave-to {
-  transform: translateX(-100vw);
+  transform: translateX(-100vw) scale(0);
 }
 </style>

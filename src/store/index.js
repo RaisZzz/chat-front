@@ -2,6 +2,7 @@ import {createStore} from "vuex"
 import {query} from "@/query"
 import md5 from 'js-md5'
 import {messages} from '../translate/index'
+import helpers from "@/helpers";
 
 const store = createStore({
     state () {
@@ -17,11 +18,17 @@ const store = createStore({
             chatsPosition: {},
             currentChat: 0,
             error: null,
-            newMessages: []
+            newMessages: [],
+            chatsLoading: true
         }
     },
     mutations: {
         openChat(state, {chat}) {
+            if (helpers.mobile()) {
+                for(const key of Object.keys(state.openedChats)) {
+                    delete state.openedChats[key]
+                }
+            }
             state.openedChats = Object.assign(state.openedChats, chat)
             setCurrentChat(state, Object.keys(chat)[0])
             changePosition(state, 1, Object.keys(chat)[0])
@@ -34,8 +41,16 @@ const store = createStore({
             setCurrentChat(state, index)
         },
         setChatPosition(state, {index, x, y}) {
-            state.chatsPosition[index].x = x
-            state.chatsPosition[index].y = y
+            if (x <= 0) {
+                state.chatsPosition[index].x = 0
+            } else {
+                state.chatsPosition[index].x = x
+            }
+            if (y <= 0) {
+                state.chatsPosition[index].y = 0
+            } else {
+                state.chatsPosition[index].y = y
+            }
         },
         data(state, data) {
             state.user.id = data.user.id
@@ -105,11 +120,13 @@ const store = createStore({
             }})
         },
         async getChats({state, dispatch}) {
+            state.chatsLoading = true
             const response = await query({method: 'get', query: 'chat/all', params: {
                 userId: state.user.id
             }})
             response.data.chats = await setTitle(state, dispatch, response.data.chats)
             Object.assign(state.chats, response.data.chats)
+            state.chatsLoading = false
             return response
         },
         async message({state, dispatch}, data) {
@@ -188,6 +205,9 @@ const store = createStore({
         },
         newMessages: state => {
             return state.newMessages
+        },
+        chatsLoading: state => {
+            return state.chatsLoading
         }
     }
 })

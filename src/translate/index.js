@@ -17,6 +17,7 @@ export const messages = {
         selectUser: "Откройте чат..",
         chat: {
             search: "Найти пользователей",
+            searchMobile: "Поиск",
             searchPlaceholder: "Введите имя/email..",
             start: "Написать",
             enterMsg: "Введите сообщение..",

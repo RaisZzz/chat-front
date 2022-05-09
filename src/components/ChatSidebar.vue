@@ -1,7 +1,8 @@
 <template>
   <div class="sidebar">
     <p class="sidebar__logo">{{ title }}</p>
-    <p v-if="!Object.keys(chats).length" class="sidebar__null">{{ $t('chat.null') }}</p>
+    <MainLoader v-if="loading" />
+    <p v-if="!Object.keys(chats).length && !loading" class="sidebar__null">{{ $t('chat.null') }}</p>
     <div class="sidebar__chats">
       <SidebarItem
           v-for="(chat, index) in chats"
@@ -15,14 +16,18 @@
 
 <script>
 import SidebarItem from "@/components/SidebarItem";
+import MainLoader from "@/components/loaders/MainLoader";
 export default {
-  components: {SidebarItem},
+  components: {MainLoader, SidebarItem},
   computed: {
     title() {
       return process.env.VUE_APP_TITLE
     },
     chats() {
       return this.$store.getters['chats']
+    },
+    loading() {
+      return this.$store.getters['chatsLoading']
     }
   }
 }
@@ -61,5 +66,16 @@ export default {
   max-height: 100%;
   overflow-y: auto;
   flex: 1;
+}
+
+@media screen and (max-width: 800px) {
+  .sidebar__logo {
+    font-size: 20px;
+  }
+}
+@media screen and (max-width: 450px) {
+  .sidebar__logo {
+    font-size: 16px;
+  }
 }
 </style>

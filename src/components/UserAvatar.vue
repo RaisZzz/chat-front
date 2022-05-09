@@ -1,7 +1,7 @@
 <template>
   <div class="avatar-wrapper" :style="styles">
     <span class="avatar-title" v-if="title" :style="fontSize">{{title}}</span>
-    <img src="" alt="" class="avatar" v-else>
+    <img v-else src="" alt="" class="avatar">
   </div>
 </template>
 
@@ -13,7 +13,7 @@ export default {
     }
   },
   mounted() {
-    if (!this.useravatar) {
+    if (!this.useravatar && this.username) {
       this.title = this.username.charAt(0)
     }
   },
@@ -40,6 +40,7 @@ export default {
   position: relative;
   background: var(--secondary-color);
   border-radius: 50%;
+  overflow: hidden;
 }
 .avatar-title {
   position: absolute;

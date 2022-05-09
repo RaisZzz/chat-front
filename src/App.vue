@@ -135,6 +135,18 @@ body {
   font-size: 12px;
   color: var(--primary-color);
 }
+
+@media screen and (max-width: 800px) {
+  :root {
+    --sidebar-width: 180px;
+    --header-height: 60px;
+  }
+}
+@media screen and (max-width: 450px) {
+  :root {
+    --sidebar-width: 140px;
+  }
+}
 </style>
 
 <style scoped>

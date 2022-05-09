@@ -65,6 +65,8 @@ export default {
   max-width: 100%;
   overflow: hidden;
   text-overflow: ellipsis;
+  text-align: left;
+  white-space: nowrap;
 }
 .sidebar-item:hover {
   opacity: 0.7;
@@ -74,5 +76,11 @@ export default {
 }
 .sidebar-item.active .sidebar-item__name {
   color: #fff;
+}
+
+@media screen and (max-width: 800px) {
+  .sidebar-item {
+    padding: 10px;
+  }
 }
 </style>

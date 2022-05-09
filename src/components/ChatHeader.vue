@@ -20,22 +20,27 @@
   </transition>
   <div class="header">
     <button class="header__invite" @click="openSearch">{{ $t('chat.search') }}</button>
+    <button class="header__invite mobile" @click="openSearch">{{ $t('chat.searchMobile') }}</button>
+    <button class="header__invite mobile icon" @click="openSearch">
+      <SearchIcon class="header__invite-icon" />
+    </button>
     <div class="header__settings-wrapper">
       <div class="header__info">
         <p class="header__name">{{name}}</p>
         <p class="header__email">{{email}}</p>
       </div>
       <UserAvatar class="header__avatar" :class="{ rotate : settings }" v-if="name" :username="name" :useravatar="avatar" :size="50" @click="openSettings"/>
-      <transition name="right">
-        <div class="header__settings" v-if="settings">
-          <button class="header__settings-button" @click="logout">{{ $t('settings.logout') }}</button>
-        </div>
-      </transition>
     </div>
+    <transition name="right">
+      <div class="header__settings" v-if="settings">
+        <button class="header__settings-button" @click="logout">{{ $t('settings.logout') }}</button>
+      </div>
+    </transition>
   </div>
 </template>
 <script>
 import UserAvatar from "@/components/UserAvatar";
+import SearchIcon from "@/components/icons/SearchIcon";
 export default {
   data: () => {
     return {
@@ -48,6 +53,7 @@ export default {
     }
   },
   components: {
+    SearchIcon,
     UserAvatar
   },
   methods: {
@@ -71,7 +77,7 @@ export default {
     async openChat(userId) {
       const response = await this.$store.dispatch('startChat', userId)
       if (response.status === 200) {
-        this.searchOpened = false
+        this.closeSearch()
       }
     },
     async searchStart() {
@@ -118,10 +124,11 @@ export default {
   align-items: center;
   justify-content: space-between;
   height: var(--header-height);
-  padding: 15px 20px;
+  padding: 0 20px;
   background: rgba(255, 255, 255, 0.5);
   box-shadow: 3px 0 20px 1px rgba(0, 0, 0, 0.1);
   backdrop-filter: blur(4px);
+  gap: 20px;
 }
 .header__invite {
   color: #fff;
@@ -136,6 +143,10 @@ export default {
   cursor: pointer;
   transition: var(--main-trans);
 }
+.header__invite.mobile,
+.header__invite.mobile.icon {
+  display: none;
+}
 .header__invite:hover {
   opacity: 0.7;
 }
@@ -143,20 +154,29 @@ export default {
   position: relative;
   display: flex;
   align-items: center;
+  justify-content: flex-end;
   gap: 20px;
+  overflow: hidden;
 }
 .header__info {
   display: flex;
   flex-direction: column;
   align-items: flex-end;
+  overflow: hidden;
 }
 .header__name {
   font-weight: bold;
   font-size: 14px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-width: 100%;
 }
 .header__email {
   font-size: 14px;
   opacity: 0.5;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-width: 100%;
 }
 .header__avatar {
   cursor: pointer;
@@ -168,8 +188,8 @@ export default {
 .header__settings {
   position: absolute;
   width: 250px;
-  top: 100%;
-  right: 0;
+  top: var(--header-height);
+  right: 20px;
   background: rgba(255, 255, 255, 0.5);
   box-shadow: 0 0 20px 1px rgba(0, 0, 0, 0.1);
   backdrop-filter: blur(4px);
@@ -254,7 +274,7 @@ export default {
   display: flex;
   flex-direction: column;
   align-items: flex-start;
-  max-width: 80%;
+  overflow: hidden;
 }
 .users {
   display: flex;
@@ -277,6 +297,8 @@ export default {
   font-size: 16px;
   overflow: hidden;
   text-overflow: ellipsis;
+  max-width: 100%;
+  white-space: nowrap;
 }
 .user__name-owner {
   color: var(--primary-color);
@@ -286,6 +308,9 @@ export default {
 .user__email {
   font-size: 12px;
   opacity: 0.5;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-width: 100%;
 }
 .user__open {
   border: none;
@@ -314,5 +339,46 @@ export default {
 }
 .invite-popup__loading {
   text-align: center;
+}
+
+@media screen and (max-width: 800px) {
+  .header__invite {
+    font-size: 12px;
+  }
+  .header__invite {
+    display: none;
+  }
+  .header__invite.mobile {
+    display: block;
+  }
+}
+@media screen and (max-width: 650px) {
+  .header__invite {
+    padding: 7px;
+  }
+  .header__settings {
+    width: 180px;
+  }
+  .header__settings-button {
+    font-size: 14px;
+  }
+}
+@media screen and (max-width: 450px) {
+  .header {
+    padding: 0 10px;
+    gap: 10px;
+  }
+  .header__settings {
+    right: 10px;
+  }
+  .header__invite.mobile {
+    display: none;
+  }
+  .header__invite.mobile.icon {
+    display: block;
+  }
+  .header__invite-icon {
+    min-width: 15px;
+  }
 }
 </style>

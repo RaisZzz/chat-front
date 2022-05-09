@@ -1,5 +1,6 @@
 <template>
-  <div class="chat" :class="{ fullScreen }" :style="position">
+  <div class="chat" :class="{ fullScreen }" :style="position" @click="setActive">
+    <MainLoader v-if="loading" class="chat__loader" />
     <div class="chat__header" @mousedown="moveStart" ref="chat">
       <UserAvatar :username="chat.title" :useravatar="chat.userAvatar" :size="20" />
       <p class="chat__header-name">{{chat.title}}</p>
@@ -35,8 +36,10 @@ import UserAvatar from "@/components/UserAvatar";
 import FullscreenIcon from "@/components/icons/FullscreenIcon";
 import CloseIcon from "@/components/icons/CloseIcon";
 import SendIcon from "@/components/icons/SendIcon";
+import MainLoader from "@/components/loaders/MainLoader";
 export default {
   components: {
+    MainLoader,
     SendIcon,
     CloseIcon,
     FullscreenIcon,
@@ -56,19 +59,25 @@ export default {
     closeChat() {
       this.$store.commit('closeChat', {index: this.index})
     },
-    moveStart(event) {
+    setActive() {
       this.$store.commit('setCurrentChat', {index: this.index})
+    },
+    moveStart(event) {
+      this.setActive()
 
+      if (this.fullScreen) return
       const position = this.position
       const startX = event.x
       const startY = event.y
       const index = this.index
       const store = this.$store
+      document.querySelectorAll('*').forEach(el => {
+        el.style.userSelect = 'none'
+      })
 
       const moveListener = function(event) {
         const x = parseInt(position.left.slice(0, -2)) + event.x - startX
         const y = parseInt(position.top.slice(0, -2)) + event.y - startY
-
         store.commit('setChatPosition', {index, x, y})
       }
 
@@ -76,6 +85,15 @@ export default {
 
       document.body.addEventListener('mouseup', function() {
         document.body.removeEventListener('mousemove', moveListener, false)
+        document.querySelectorAll('*').forEach(el => {
+          el.style.userSelect = 'initial'
+        })
+      })
+      document.addEventListener('mouseleave', function() {
+        document.body.removeEventListener('mousemove', moveListener, false)
+        document.querySelectorAll('*').forEach(el => {
+          el.style.userSelect = 'initial'
+        })
       })
     },
     async sendMessage() {
@@ -106,6 +124,7 @@ export default {
         const response = await this.$store.dispatch('getMessages', {chatId: this.chat.id, offset: this.offset})
         if (!response || !response.data || !response.data.messages || !response.data.messages.length) {
           this.stop = true
+          this.loading = false
           return
         }
         response.data.messages.forEach(msg => {
@@ -125,7 +144,7 @@ export default {
   computed: {
     position() {
       if (this.$store.getters['currentChat']) {
-        let index = 0
+        let index = 6
         if (this.$store.getters['currentChat'] == this.index) {
           index = 9
         }
@@ -181,11 +200,18 @@ export default {
   transition: var(--main-trans);
   transition-property: width, height;
 }
+.chat__loader {
+  position: absolute;
+  top: 30px;
+  left: 50%;
+  transform: translateX(-50%);
+}
 .chat.fullScreen {
-  width: 100%;
-  height: 100%;
-  top: 0 !important;
-  left: 0 !important;
+  position: fixed;
+  width: calc(100% - var(--sidebar-width));
+  height: calc(100% - var(--header-height));
+  top: var(--header-height) !important;
+  left: var(--sidebar-width) !important;
   border-radius: 0;
   border-color: rgba(0,0,0,0);
   --chat-input: 100px;
