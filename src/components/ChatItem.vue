@@ -23,7 +23,7 @@
         {{msg.text}}
         <span class="chat__message-date">{{getDate(msg.createdAt)}}</span>
       </p>
-      <p class="chat__messages-null" v-if="!messages.length">{{ $t('chat.notMessages') }}</p>
+      <p class="chat__messages-null" v-if="!messages.length && !loading">{{ $t('chat.notMessages') }}</p>
     </div>
     <form class="chat__input" @submit.prevent="sendMessage">
       <textarea class="chat__input-textarea" v-model="message" :placeholder="$t('chat.enterMsg')" ref="textarea"></textarea>
@@ -335,7 +335,7 @@ export default {
 .chat__messages-null {
   text-align: center;
   font-size: 14px;
-  margin: 0 auto;
+  margin: auto auto 0;
 }
 .chat__input {
   height: var(--chat-input);

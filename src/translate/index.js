@@ -15,10 +15,14 @@ export const messages = {
         },
         loading: "Данные загружаются",
         selectUser: "Откройте чат..",
+        sidebar: {
+          search: "Введите имя.."
+        },
         chat: {
             search: "Найти пользователей",
             searchMobile: "Поиск",
             searchPlaceholder: "Введите имя/email..",
+            usersNull: "Таких пользователей нет.",
             start: "Написать",
             enterMsg: "Введите сообщение..",
             notMessages: "Сообщений нет.",

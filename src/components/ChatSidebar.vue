@@ -2,10 +2,11 @@
   <div class="sidebar">
     <p class="sidebar__logo">{{ title }}</p>
     <MainLoader v-if="loading" />
-    <p v-if="!Object.keys(chats).length && !loading" class="sidebar__null">{{ $t('chat.null') }}</p>
+    <input v-if="!loading && Object.keys(initialChats).length" type="text" class="sidebar__search" @input="userSearch" v-model="search" :placeholder="$t('sidebar.search')">
+    <p v-if="!Object.keys(initialChats).length && !loading" class="sidebar__null">{{ $t('chat.null') }}</p>
     <div class="sidebar__chats">
       <SidebarItem
-          v-for="(chat, index) in chats"
+          v-for="(chat, index) in initialChats"
           :key="index"
           :index="index"
           :chat="chat"
@@ -18,7 +19,26 @@
 import SidebarItem from "@/components/SidebarItem";
 import MainLoader from "@/components/loaders/MainLoader";
 export default {
+  data: () => {
+    return {
+      search: '',
+      initialChats: {}
+    }
+  },
   components: {MainLoader, SidebarItem},
+  methods: {
+    userSearch() {
+      this.initialChats = {...this.chats}
+      for(const key of Object.keys(this.initialChats)) {
+        if (this.initialChats[key].title.search(this.search) <= -1) {
+          delete this.initialChats[key]
+        }
+      }
+    }
+  },
+  mounted() {
+    this.initialChats = this.chats
+  },
   computed: {
     title() {
       return process.env.VUE_APP_TITLE
@@ -44,6 +64,7 @@ export default {
   z-index: 5;
   display: flex;
   flex-direction: column;
+  overflow: hidden;
 }
 .sidebar__logo {
   text-align: center;
@@ -57,6 +78,23 @@ export default {
   font-size: 28px;
   text-transform: uppercase;
   border-bottom: 1px solid #EBEBFF;
+  position: relative;
+  z-index: 3;
+  background-color: #fff;
+}
+.sidebar__search {
+  outline: none;
+  border: none;
+  padding: 15px;
+  font-size: 14px;
+  font-family: 'Montserrat', sans-serif;
+  box-shadow: 0 7px 20px 1px rgb(0 0 0 / 10%);
+  position: relative;
+  transition: var(--main-trans);
+  border-bottom: 2px solid rgba(0,0,0,0);
+}
+.sidebar__search:focus {
+  border-color: var(--primary-color);
 }
 .sidebar__null {
   text-align: center;

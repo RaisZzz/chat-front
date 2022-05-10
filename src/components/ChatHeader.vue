@@ -4,6 +4,7 @@
       <div class="invite-popup__bg" @click="closeSearch"></div>
       <div class="invite-popup">
         <input class="invite-popup__search" type="text" v-model="search" @input="searchStart" :placeholder="$t('chat.searchPlaceholder')">
+        <MainLoader class="invite-popup__loader" v-if="usersLoading" />
         <div class="users" @scroll="usersScroll" ref="users">
           <div class="user" v-for="user in users" :key="user.id">
             <UserAvatar :username="user.username" :avatar="user.avatar" size="30" />
@@ -14,7 +15,7 @@
             <button class="user__open" @click="openChat(user.id)">{{ $t('chat.start') }}</button>
           </div>
         </div>
-        <p v-if="!users.length" class="invite-popup__loading">{{ $t('loading') }}</p>
+        <p v-if="!users.length & !usersLoading" class="invite-popup__loading">{{ $t('chat.usersNull') }}</p>
       </div>
     </div>
   </transition>
@@ -24,7 +25,8 @@
     <button class="header__invite mobile icon" @click="openSearch">
       <SearchIcon class="header__invite-icon" />
     </button>
-    <div class="header__settings-wrapper">
+    <MainLoader v-if="!name && !email" class="header__settings-loading"/>
+    <div class="header__settings-wrapper" v-else>
       <div class="header__info">
         <p class="header__name">{{name}}</p>
         <p class="header__email">{{email}}</p>
@@ -41,6 +43,7 @@
 <script>
 import UserAvatar from "@/components/UserAvatar";
 import SearchIcon from "@/components/icons/SearchIcon";
+import MainLoader from "@/components/loaders/MainLoader";
 export default {
   data: () => {
     return {
@@ -53,6 +56,7 @@ export default {
     }
   },
   components: {
+    MainLoader,
     SearchIcon,
     UserAvatar
   },
@@ -66,8 +70,10 @@ export default {
     },
     async openSearch() {
       this.searchOpened = true
+      this.usersLoading = true
       const response = await this.$store.dispatch('getUsers', {offset: this.users.length, search: this.search})
       this.users = response.data.users
+      this.usersLoading = false
     },
     closeSearch() {
       this.searchOpened = false
@@ -81,9 +87,12 @@ export default {
       }
     },
     async searchStart() {
+      this.usersLoading = true
       this.users = []
       const response = await this.$store.dispatch('getUsers', {offset: this.users.length, search: this.search})
       this.users = response.data.users
+      this.usersStop = false
+      this.usersLoading = false
     },
     async usersScroll() {
       if (this.usersLoading || this.usersStop) return
@@ -129,6 +138,11 @@ export default {
   box-shadow: 3px 0 20px 1px rgba(0, 0, 0, 0.1);
   backdrop-filter: blur(4px);
   gap: 20px;
+}
+.header__settings-loading {
+  position: absolute;
+  right: 20px;
+  top: calc(50% - 35px);
 }
 .header__invite {
   color: #fff;
@@ -253,11 +267,12 @@ export default {
   border-radius: 10px;
   display: flex;
   flex-direction: column;
+  position: relative;
 }
 .invite-popup__search {
   position: relative;
   width: 100%;
-  margin-bottom: 40px;
+  margin-bottom: 20px;
   border: solid var(--secondary-color);
   border-width: 0 0 2px 0;
   padding: 10px 0;
@@ -268,6 +283,11 @@ export default {
 }
 .invite-popup__search:focus {
   border-color: var(--primary-color);
+}
+.invite-popup__loader {
+  position: absolute;
+  left: calc(50% - 15px);
+  top: 45px;
 }
 .user-col {
   flex: 1;
@@ -284,6 +304,7 @@ export default {
   height: 100%;
   max-height: 400px;
   overflow-y: auto;
+  position: relative;
 }
 .user {
   display: flex;
