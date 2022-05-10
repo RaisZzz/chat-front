@@ -127,9 +127,7 @@ const store = createStore({
         },
         async getChats({state, dispatch}) {
             state.chatsLoading = true
-            const response = await query({method: 'get', query: 'chat/all', params: {
-                userId: state.user.id
-            }})
+            const response = await query({method: 'get', query: 'chat/all'})
             response.data.chats = await setTitle(state, dispatch, response.data.chats)
             Object.assign(state.chats, response.data.chats)
             state.chatsLoading = false
@@ -140,13 +138,9 @@ const store = createStore({
                 if (msg.userId !== state.user.id) {
                     messageAudio.play()
                 }
-                console.log(state.chats[msg.chatId])
                 if (!state.chats[msg.chatId]) {
-                    const response = await query({method: 'get', query: 'chat/all', params: {
-                        userId: state.user.id
-                    }})
+                    const response = await query({method: 'get', query: 'chat/all'})
                     response.data.chats = await setTitle(state, dispatch, response.data.chats)
-                    console.log(response.data.chats)
                     state.chats = response.data.chats
                 }
             }
@@ -175,11 +169,11 @@ const store = createStore({
             const chat = await setTitle(state, dispatch, {chat: socketChat})
             state.chats[chat.chat.id] = chat.chat
         },
+        // eslint-disable-next-line no-unused-vars
         async sendMessage({state}, {chatId, message}) {
             return await query({method: 'post', query: 'chat/sendMessage', params: {
                 chatId,
-                message,
-                userId: state.user.id
+                message
             }})
         },
         // eslint-disable-next-line no-unused-vars
