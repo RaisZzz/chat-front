@@ -9,11 +9,11 @@
 </template>
 
 <script>
-import ChatSidebar from "@/components/ChatSidebar";
-import ChatHeader from "@/components/ChatHeader";
-import ChatMain from "@/components/ChatMain";
-import helpers from "@/helpers";
-import {io} from "socket.io-client";
+import ChatSidebar from "@/components/ChatSidebar"
+import ChatHeader from "@/components/ChatHeader"
+import ChatMain from "@/components/ChatMain"
+import helpers from "@/helpers"
+import {io} from "socket.io-client"
 export default {
   data: () => {
     return {
@@ -30,24 +30,22 @@ export default {
       this.mobile = true
     }
     const vueThis = this
-    this.$store.commit('setSocket', {socket:
-          io(`ws://${process.env.VUE_APP_HOST}:${process.env.VUE_APP_SOCKET_PORT}`, {
-            autoConnect: false
-          })
-    })
-    this.$store.getters['socket'].connect()
-    this.$store.getters['socket'].on('connect', async function() {
-      const response = await vueThis.$store.dispatch('auth')
-      if (response === 401) {
-        vueThis.$router.push({path: '/login'})
-      }
-      if (response.data.token) {
-        await vueThis.$store.dispatch('getData')
-        vueThis.$store.getters['socket'].on('message', (data) => {
-          vueThis.$store.dispatch('message', data)
-        })
-      }
-    })
+    const response = await vueThis.$store.dispatch('auth')
+    if (response === 401) {
+      vueThis.$router.push({path: '/login'})
+    }
+    if (response.data.token) {
+      this.$store.commit('setSocket', {socket:
+            io(`ws://${process.env.VUE_APP_HOST}:${process.env.VUE_APP_SOCKET_PORT}/?userId=${response.data.user.id}`, {
+              autoConnect: false
+            })
+      })
+      this.$store.getters['socket'].connect()
+      await vueThis.$store.dispatch('getData')
+      vueThis.$store.getters['socket'].on('message', (data) => {
+        vueThis.$store.dispatch('message', data)
+      })
+    }
   }
 }
 </script>
