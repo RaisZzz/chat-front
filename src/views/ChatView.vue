@@ -40,7 +40,7 @@ export default {
               autoConnect: false
             })
       })
-      this.$store.getters['socket'].connect()
+      await this.$store.getters['socket'].connect()
       await vueThis.$store.dispatch('getData')
       vueThis.$store.getters['socket'].on('message', (data) => {
         vueThis.$store.dispatch('message', data)

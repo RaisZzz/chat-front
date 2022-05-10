@@ -74,6 +74,7 @@ const store = createStore({
             state.currentChat = 0
             state.error = null
 
+            state.socket.disconnect()
             localStorage.removeItem('token')
         },
         setError(state, error) {
