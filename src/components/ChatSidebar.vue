@@ -2,7 +2,7 @@
   <div class="sidebar">
     <p class="sidebar__logo">{{ title }}</p>
     <MainLoader v-if="loading" />
-    <input v-if="!loading && Object.keys(initialChats).length" type="text" class="sidebar__search" @input="userSearch" v-model="search" :placeholder="$t('sidebar.search')">
+    <input v-if="!loading" type="text" class="sidebar__search" @input="userSearch" v-model="search" :placeholder="$t('sidebar.search')">
     <p v-if="!Object.keys(initialChats).length && !loading" class="sidebar__null">{{ $t('chat.null') }}</p>
     <div class="sidebar__chats">
       <SidebarItem
@@ -16,8 +16,8 @@
 </template>
 
 <script>
-import SidebarItem from "@/components/SidebarItem";
-import MainLoader from "@/components/loaders/MainLoader";
+import SidebarItem from "@/components/SidebarItem"
+import MainLoader from "@/components/loaders/MainLoader"
 export default {
   data: () => {
     return {
@@ -48,6 +48,11 @@ export default {
     },
     loading() {
       return this.$store.getters['chatsLoading']
+    }
+  },
+  watch: {
+    chats() {
+      this.initialChats = {...this.chats}
     }
   }
 }

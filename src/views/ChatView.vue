@@ -12,8 +12,8 @@
 import ChatSidebar from "@/components/ChatSidebar";
 import ChatHeader from "@/components/ChatHeader";
 import ChatMain from "@/components/ChatMain";
-import { io } from "socket.io-client";
 import helpers from "@/helpers";
+import {io} from "socket.io-client";
 export default {
   data: () => {
     return {
@@ -30,20 +30,22 @@ export default {
       this.mobile = true
     }
     const vueThis = this
-    const socket = io(`ws://${process.env.VUE_APP_HOST}:${process.env.VUE_APP_SOCKET_PORT}`, {
-      autoConnect: false
+    this.$store.commit('setSocket', {socket:
+          io(`ws://${process.env.VUE_APP_HOST}:${process.env.VUE_APP_SOCKET_PORT}`, {
+            autoConnect: false
+          })
     })
-    socket.connect()
-    socket.on('connect', async function() {
+    this.$store.getters['socket'].connect()
+    this.$store.getters['socket'].on('connect', async function() {
       const response = await vueThis.$store.dispatch('auth')
       if (response === 401) {
         vueThis.$router.push({path: '/login'})
       }
       if (response.data.token) {
         await vueThis.$store.dispatch('getData')
-        socket.on('message', (data) => {
+        vueThis.$store.getters['socket'].on('message', (data) => {
           vueThis.$store.dispatch('message', data)
-        });
+        })
       }
     })
   }

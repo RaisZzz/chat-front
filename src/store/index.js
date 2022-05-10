@@ -8,6 +8,7 @@ const messageAudio = new Audio(require('@/assets/message.mp3'))
 const store = createStore({
     state () {
         return {
+            socket: null,
             user: {
                 id: 0,
                 name: '',
@@ -24,6 +25,9 @@ const store = createStore({
         }
     },
     mutations: {
+        setSocket(state, {socket}) {
+            state.socket = socket
+        },
         openChat(state, {chat}) {
             if (helpers.mobile()) {
                 for(const key of Object.keys(state.openedChats)) {
@@ -135,16 +139,19 @@ const store = createStore({
                 if (msg.userId !== state.user.id) {
                     messageAudio.play()
                 }
+                console.log(state.chats[msg.chatId])
                 if (!state.chats[msg.chatId]) {
                     const response = await query({method: 'get', query: 'chat/all', params: {
                         userId: state.user.id
                     }})
                     response.data.chats = await setTitle(state, dispatch, response.data.chats)
+                    console.log(response.data.chats)
                     state.chats = response.data.chats
                 }
             }
             state.newMessages = data
         },
+        // eslint-disable-next-line no-unused-vars
         async startChat({state, dispatch, commit}, user_id) {
             let users = []
             if (state.user.id === user_id) {
@@ -186,9 +193,19 @@ const store = createStore({
             return await query({method: 'get', query: 'user/', params: {
                 userId
             }})
+        },
+        // eslint-disable-next-line no-unused-vars
+        async deleteMessages({state}, {chatId, messages}) {
+            return await query({method: 'post', query: 'chat/deleteMessages', params: {
+                chatId,
+                messages
+            }})
         }
     },
     getters: {
+        socket: state => {
+            return state.socket
+        },
         user: state => {
             return state.user
         },
