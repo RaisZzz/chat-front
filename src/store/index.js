@@ -2,7 +2,8 @@ import {createStore} from "vuex"
 import {query} from "@/query"
 import md5 from 'js-md5'
 import {messages} from '../translate/index'
-import helpers from "@/helpers";
+import helpers from "@/helpers"
+const messageAudio = new Audio(require('@/assets/message.mp3'))
 
 const store = createStore({
     state () {
@@ -131,6 +132,9 @@ const store = createStore({
         },
         async message({state, dispatch}, data) {
             for (const msg of data) {
+                if (msg.userId !== state.user.id) {
+                    messageAudio.play()
+                }
                 if (!state.chats[msg.chatId]) {
                     const response = await query({method: 'get', query: 'chat/all', params: {
                         userId: state.user.id
