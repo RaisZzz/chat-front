@@ -1,8 +1,8 @@
 import {createStore} from "vuex"
 import {query} from "@/query"
 import md5 from 'js-md5'
-import {messages} from '../translate/index'
 import helpers from "@/helpers"
+import {messages} from "@/translate"
 const messageAudio = new Audio(require('@/assets/message.mp3'))
 
 const store = createStore({
@@ -125,22 +125,23 @@ const store = createStore({
                 search
             }})
         },
-        async getChats({state, dispatch}) {
+        async getChats({state}) {
             state.chatsLoading = true
             const response = await query({method: 'get', query: 'chat/all'})
-            response.data.chats = await setTitle(state, dispatch, response.data.chats)
-            Object.assign(state.chats, response.data.chats)
+            response.data.chats.forEach(chat => {
+                if (chat.personal) chat.title = messages[localStorage.getItem('locale')].chat.personal
+                state.chats[chat.id] = chat
+            })
             state.chatsLoading = false
             return response
         },
-        async message({state, dispatch}, data) {
+        async message({state}, data) {
             for (const msg of data) {
                 if (msg.userId !== state.user.id) {
                     messageAudio.play()
                 }
                 if (!state.chats[msg.chatId]) {
                     const response = await query({method: 'get', query: 'chat/all'})
-                    response.data.chats = await setTitle(state, dispatch, response.data.chats)
                     state.chats = response.data.chats
                 }
             }
@@ -158,16 +159,15 @@ const store = createStore({
                 userId: user_id,
                 users
             }})
-            const chat = await setTitle(state, dispatch, {chat: response.data[Object.keys(response.data)[0]]})
-            state.chats[Object.keys(response.data)[0]] = chat.chat
+            if (response.data.chat.personal) response.data.chat.title = messages[localStorage.getItem('locale')].chat.personal
+            state.chats[response.data.chat.id] = response.data.chat
             commit('openChat', {chat: {
-                [Object.keys(response.data)[0]]: chat.chat
+                [response.data.chat.id]: response.data.chat
             }})
             return response
         },
-        async startChatSocket({state, dispatch}, socketChat) {
-            const chat = await setTitle(state, dispatch, {chat: socketChat})
-            state.chats[chat.chat.id] = chat.chat
+        async startChatSocket({state}, socketChat) {
+            state.chats[socketChat.id] = socketChat
         },
         // eslint-disable-next-line no-unused-vars
         async sendMessage({state}, {chatId, message}) {
@@ -271,24 +271,6 @@ function changePosition(state, action, index) {
 
 function setCurrentChat(state, index) {
     state.currentChat = index
-}
-
-async function setTitle(state, dispatch, chats) {
-    for (const value of Object.values(chats)) {
-        if (!value.title) {
-            if (value.usersIn.length === 1 && value.usersIn[0] === state.user.id) {
-                value.title = messages[localStorage.getItem('locale')].chat.personal
-            } else {
-                for (const user of value.usersIn) {
-                    if (user !== state.user.id) {
-                        const userGet = await dispatch('getUser', {userId: user})
-                        value.title = userGet.data.user[0].username
-                    }
-                }
-            }
-        }
-    }
-    return chats
 }
 
 export default store

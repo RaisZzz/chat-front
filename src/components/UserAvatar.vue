@@ -1,7 +1,7 @@
 <template>
   <div class="avatar-wrapper" :style="styles">
-    <span class="avatar-title" v-if="title" :style="fontSize">{{title}}</span>
-    <img v-else src="" alt="" class="avatar">
+    <span class="avatar-title" v-if="title && !useravatar" :style="fontSize">{{title}}</span>
+    <img v-if="useravatar" src="" alt="" class="avatar">
   </div>
 </template>
 
