@@ -142,7 +142,10 @@ const store = createStore({
                 }
                 if (!state.chats[msg.chatId]) {
                     const response = await query({method: 'get', query: 'chat/all'})
-                    state.chats = response.data.chats
+                    response.data.chats.forEach(chat => {
+                        if (chat.personal) chat.title = messages[localStorage.getItem('locale')].chat.personal
+                        state.chats[chat.id] = chat
+                    })
                 }
             }
             state.newMessages = data

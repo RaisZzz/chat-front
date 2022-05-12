@@ -3,8 +3,8 @@
     <form class="form" @input="checkForm" @submit.prevent="login">
       <p class="form__title">{{ title }}</p>
       <div class="form__input-wrapper">
-        <input type="text" v-model="email" :class="{ error : emailError }" class="form__input" name="email" :placeholder="$t('form.email')">
-        <input type="password" v-model="password" :class="{ error : passwordError }" class="form__input" name="password" :placeholder="$t('form.password')">
+        <input autocomplete="email" type="text" v-model="email" :class="{ error : emailError }" class="form__input" name="email" :placeholder="$t('form.email')">
+        <input autocomplete="password" type="password" v-model="password" :class="{ error : passwordError }" class="form__input" name="password" :placeholder="$t('form.password')">
       </div>
       <input type="submit" class="form__submit" :disabled="disabled" :value="$t('form.login')">
       <router-link class="form__link" to="/registration">{{ $t("form.registration") }}</router-link>
